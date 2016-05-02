@@ -11,13 +11,19 @@ def validate_type(method):
         # Run the decorated method.
         value = method(self, value)
 
+        if self.__class__.__name__ == 'JSONField' and isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except ValueError:
+                pass
+
         # If we don't have a type declared, then we're done;
         # return the value outright.
         if not self._type or isinstance(value, self._type):
             return value
 
         # This might be a "falsy" value.
-        # 
+        #
         # If we have a falsy value, we don't want to be particularly picky
         # about the type; we just need to convert this to the equivalent
         # falsy value of the correct type.
